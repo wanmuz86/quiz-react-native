@@ -9,7 +9,8 @@ export default class Question extends React.Component {
       questions: [], // same like usestate
       currentQuestion: 0,
       score: 0,
-      win:false
+      win:false,
+      highscore:0
     }
     // Refer to FCC (binding) - module 2 revision
     this.answerPress = this.answerPress.bind(this);
@@ -41,9 +42,9 @@ export default class Question extends React.Component {
     }
 
     // When I reach last question == 9 , I will check the high score
-    console.log('here is current question ')
+    
     if (this.state.currentQuestion == 9) {
-      console.log('arrived')
+   
       try {
         const value = await AsyncStorage.getItem('highscore')
         if (value !== null) {
@@ -60,13 +61,19 @@ export default class Question extends React.Component {
               console.log(e)
             }
             this.setState({
-              win:true
+              win:true,
+              highscore:this.state.score
             });
 
           }
+          else {
+            this.setState({
+              highscore:parseInt(value)
+            })
+          }
         }
         else {
-          console.log('new score')
+       
           //Scenario first time playing == no high score 
           // Save as new high score
           try {
@@ -75,6 +82,10 @@ export default class Question extends React.Component {
             // saving error
             console.log(e)
           }
+          this.setState({
+            win:true,
+            highscore:this.state.score
+          });
         }
       } catch (e) {
         // error reading value
@@ -88,10 +99,18 @@ export default class Question extends React.Component {
     })
 
   }
+  /*
+Congratulation you beat the highscore. New high score is 5
+Too bad, you have not beat the highscore which is 5. Try again!
+  */
   render() {
     let message = "";
     if (this.state.win){
       message="Congratulation you win!!"
+    }
+    else {
+      
+      message = "Too bad, you have not beat the highscore which is "+this.state.highscore+". Try again!"
     }
     if (this.state.questions.length > 0) {
       if (this.state.currentQuestion < 10) {
@@ -148,5 +167,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightyellow',
     alignItems: 'center',
     justifyContent: 'center',
+    padding:20
   },
 });
